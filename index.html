@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML5 · La Historia que Cambió la Web · Fundabit Nueva Esparta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c1:#ff6b6b; --c2:#4ecdc4; --c3:#ffe66d;
+  --c4:#a06cd5; --c5:#5ee7df;
+  --wa1:#25D366; --wa2:#128C7E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  height:100%; overflow:hidden;
+  font-family:'Nunito',system-ui,-apple-system,sans-serif;
+  background:#0b0a1f; color:#fff;
+}
+body::before{
+  content:''; position:fixed; inset:-20%;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(160,108,213,.40), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(78,205,196,.30), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255,107,107,.25), transparent 50%);
+  animation:blobFloat 20s ease-in-out infinite alternate;
+  z-index:0; pointer-events:none;
+}
+@keyframes blobFloat{
+  from{transform:translate(0,0) scale(1);}
+  to{transform:translate(-4%,4%) scale(1.15);}
+}
+.progress{position:fixed;top:0;left:0;width:100%;height:5px;background:rgba(255,255,255,.07);z-index:100;}
+.progress-bar{
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--c1),var(--c3),var(--c2),var(--c4));
+  background-size:300% 100%;
+  animation:gradShift 4s linear infinite;
+  transition:width .45s cubic-bezier(.34,1.4,.64,1);
+  box-shadow:0 0 14px rgba(78,205,196,.8);
+}
+@keyframes gradShift{to{background-position:300% 0;}}
+
+.topbar{
+  position:fixed; top:0; left:0; right:0; height:56px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 22px; z-index:99;
+  background:linear-gradient(180deg, rgba(11,10,31,.92), rgba(11,10,31,0));
+  pointer-events:none;
+}
+.eval-title{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:clamp(.9rem,2vw,1.2rem);
+  letter-spacing:1px;
+  background:linear-gradient(135deg,#ffe66d,#ff6b6b,#4ecdc4);
+  background-size:200% 200%;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:gradShift 6s ease infinite;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
+  display:flex; align-items:center; gap:8px;
+  pointer-events:auto;
+}
+.eval-title .dot-ev{
+  width:10px; height:10px; border-radius:50%;
+  background:#ff6b6b; box-shadow:0 0 12px #ff6b6b;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.counter{
+  font-family:'Fredoka',sans-serif; font-size:.85rem;
+  letter-spacing:1px; color:rgba(255,255,255,.65);
+  display:flex; align-items:center; gap:8px;
+  pointer-events:auto;
+}
+.counter b{color:#4ecdc4;font-size:1.05rem;}
+.lock-badge{
+  display:none; align-items:center; gap:4px;
+  font-size:.7rem; padding:2px 8px;
+  background:rgba(255,230,109,.15);
+  border:1px solid rgba(255,230,109,.4);
+  border-radius:999px; color:#ffe66d;
+  letter-spacing:.5px;
+}
+.lock-badge.show{display:inline-flex;}
+
+.brand{
+  position:fixed;
+  bottom:16px; left:22px;
+  z-index:100;
+  background:#fff;
+  border-radius:12px;
+  padding:6px 12px;
+  box-shadow:0 6px 22px rgba(0,0,0,.45);
+  transition:transform .3s ease, box-shadow .3s ease;
+  display:flex; align-items:center; gap:8px;
+}
+.brand img{ height:36px; display:block; }
+.brand:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 10px 30px rgba(0,0,0,.55); }
+
+.toast{
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(.9);
+  background:rgba(15,10,40,.96);
+  color:#fff;
+  padding:1rem 1.6rem;
+  border-radius:16px;
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(.9rem,2vw,1.1rem);
+  z-index:1000; opacity:0; pointer-events:none;
+  transition:opacity .3s, transform .3s;
+  border:1px solid rgba(255,230,109,.35);
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  max-width:80vw; text-align:center; line-height:1.4;
+  white-space:pre-line;
+}
+.toast.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+.deck{position:relative;width:100vw;height:100vh;z-index:1;}
+.slide{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:8vh 6vw 12vh; text-align:center;
+  opacity:0; visibility:hidden;
+  transform:scale(.92) translateY(20px);
+  transition:opacity .5s ease, transform .5s cubic-bezier(.34,1.3,.64,1), visibility .5s;
+  overflow-y:auto; scrollbar-width:none;
+}
+.slide::-webkit-scrollbar{display:none;}
+.slide.active{opacity:1; visibility:visible; transform:scale(1) translateY(0);}
+.slide.active .anim{
+  animation:popIn .65s cubic-bezier(.34,1.56,.64,1) both;
+  animation-delay:var(--d,0s);
+}
+@keyframes popIn{
+  from{opacity:0; transform:translateY(34px) scale(.88);}
+  to{opacity:1; transform:translateY(0) scale(1);}
+}
+h1,h2,h3{font-family:'Fredoka',sans-serif; line-height:1.15;}
+h2{font-size:clamp(1.5rem,4.2vw,2.7rem); font-weight:700; margin-bottom:.6rem;}
+.lead{font-size:clamp(1rem,2.4vw,1.5rem); color:rgba(255,255,255,.82); margin-bottom:.8rem;}
+.emoji{font-size:clamp(1.8rem,4vw,2.6rem); line-height:1; margin-bottom:.5rem;}
+.emoji.big{font-size:clamp(2.4rem,6vw,4rem);}
+.cover-title{font-size:clamp(2.8rem,11vw,7rem); font-weight:700; letter-spacing:-.02em; line-height:.95;}
+.grad{
+  background:linear-gradient(135deg,#ff6b6b,#ffe66d,#4ecdc4,#a06cd5,#ff6b6b);
+  background-size:300% 300%;
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:gradShift 6s ease infinite;
+}
+.cover-sub{font-size:clamp(.95rem,2.2vw,1.3rem); margin-top:.6rem; color:rgba(255,255,255,.85); font-weight:700;}
+.badge{
+  display:inline-block; padding:6px 18px; border-radius:999px;
+  background:rgba(78,205,196,.15); border:1px solid rgba(78,205,196,.5);
+  color:#5ee7df; font-size:clamp(.7rem,1.6vw,.9rem);
+  font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+}
+kbd{
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+  border-bottom-width:3px; border-radius:6px; padding:2px 8px;
+  font-family:inherit; font-size:.9em;
+}
+.cards{display:flex; gap:1.1rem; flex-wrap:wrap; justify-content:center; margin-top:1.4rem; width:100%; max-width:1120px;}
+.card{
+  flex:1 1 220px; max-width:340px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:20px; padding:1.2rem 1.1rem;
+  backdrop-filter:blur(8px);
+  transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.card:hover{
+  transform:translateY(-9px) scale(1.03);
+  border-color:rgba(78,205,196,.65);
+  box-shadow:0 14px 40px rgba(78,205,196,.22);
+}
+.card h3{font-size:clamp(1rem,2vw,1.25rem); margin-bottom:.35rem; color:#ffe66d;}
+.card p{font-size:clamp(.82rem,1.7vw,1rem); color:rgba(255,255,255,.8); line-height:1.5;}
+.code{
+  font-family:'Courier New',monospace;
+  background:rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:14px; padding:14px 20px; margin-top:1rem;
+  font-size:clamp(.68rem,1.6vw,1rem); color:#5ee7df;
+  white-space:pre-wrap; word-break:break-word;
+  text-align:left; max-width:900px; width:100%;
+  box-shadow:inset 0 0 30px rgba(78,205,196,.08);
+}
+.code-bad{color:#ff8f8f; border-color:rgba(255,107,107,.4);}
+.code-good{color:#7dffcf; border-color:rgba(78,205,196,.5); box-shadow:0 0 30px rgba(78,205,196,.25);}
+.fact{
+  margin-top:1.4rem;
+  background:rgba(255,230,109,.1);
+  border-left:5px solid #ffe66d;
+  border-radius:12px; padding:.85rem 1.3rem;
+  font-size:clamp(.85rem,1.9vw,1.1rem);
+  max-width:820px; text-align:left;
+  color:rgba(255,255,255,.92);
+}
+.vs{display:flex; align-items:center; gap:1.5rem; margin-top:1.5rem; flex-wrap:wrap; justify-content:center;}
+.fighter{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15); border-radius:20px; padding:1.2rem 2rem; min-width:170px;}
+.fighter h3{font-size:clamp(1rem,2.2vw,1.3rem);}
+.vs-badge{
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(1.4rem,4vw,2.4rem);
+  font-weight:700; color:#ff6b6b;
+  text-shadow:0 0 20px rgba(255,107,107,.8);
+  animation:pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}
+.tags{display:flex; flex-wrap:wrap; gap:.7rem; justify-content:center; margin-top:1.4rem; max-width:900px;}
+.tag{
+  font-family:'Courier New',monospace;
+  background:rgba(160,108,213,.18);
+  border:1px solid rgba(160,108,213,.55);
+  color:#d6bcff; padding:8px 16px; border-radius:999px;
+  font-size:clamp(.75rem,1.8vw,1rem);
+  transition:transform .25s, background .25s;
+}
+.tag:hover{transform:translateY(-4px) rotate(-2deg); background:rgba(160,108,213,.35);}
+.timeline{margin-top:1.6rem; max-width:760px; width:100%; text-align:left;}
+.tl-item{
+  position:relative; padding:0 0 1.1rem 2rem;
+  border-left:3px solid rgba(78,205,196,.4);
+  font-size:clamp(.85rem,1.9vw,1.05rem);
+  color:rgba(255,255,255,.85);
+}
+.tl-item:last-child{border-left-color:transparent; padding-bottom:0;}
+.tl-item b{color:#ffe66d;}
+.tl-dot{
+  position:absolute; left:-11px; top:2px;
+  width:18px; height:18px; border-radius:50%;
+  background:linear-gradient(135deg,#4ecdc4,#a06cd5);
+  box-shadow:0 0 14px rgba(78,205,196,.9);
+}
+.big-year{
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(3.5rem,14vw,9rem);
+  font-weight:700; line-height:1;
+  background:linear-gradient(135deg,#ffe66d,#ff6b6b,#a06cd5);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 30px rgba(255,107,107,.45));
+}
+.grid-apis{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:.9rem; margin-top:1.5rem; width:100%; max-width:920px;
+}
+.api{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:16px; padding:.9rem .7rem;
+  font-size:clamp(1.3rem,3vw,1.8rem);
+  transition:transform .3s, border-color .3s, box-shadow .3s;
+}
+.api b{display:block; font-size:clamp(.8rem,1.7vw,.95rem); color:#5ee7df; margin-top:.35rem; font-family:'Fredoka',sans-serif;}
+.api span{display:block; font-size:clamp(.65rem,1.4vw,.78rem); color:rgba(255,255,255,.65); margin-top:.2rem;}
+.api:hover{transform:translateY(-7px); border-color:rgba(255,230,109,.6); box-shadow:0 12px 30px rgba(255,230,109,.18);}
+
+.form-wrap{
+  display:flex; flex-direction:column; gap:.6rem;
+  width:100%; max-width:520px;
+  margin-top:1.2rem;
+}
+.exam-input{
+  font-family:inherit;
+  font-size:clamp(.9rem,1.8vw,1.05rem);
+  padding:.8rem 1.1rem;
+  border-radius:14px;
+  border:2px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  width:100%; text-align:center;
+  transition:.2s;
+}
+.exam-input:focus{
+  outline:none;
+  border-color:#4ecdc4;
+  box-shadow:0 0 20px rgba(78,205,196,.35);
+}
+.exam-input::placeholder{color:rgba(255,255,255,.4);}
+.exam-input.filled{
+  border-color:#25D366;
+  box-shadow:0 0 16px rgba(37,211,102,.35);
+}
+.form-status{
+  font-size:clamp(.75rem,1.6vw,.9rem);
+  color:#ffe66d; font-weight:700;
+  min-height:1.3em;
+  transition:.25s;
+  text-align:center;
+}
+.form-status.ok{color:#25D366;}
+.form-status.warn{color:#ff6b6b;}
+
+.start-btn{
+  margin-top:1rem;
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(.95rem,2vw,1.15rem);
+  font-weight:700;
+  padding:.85rem 2.2rem;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,#4ecdc4,#a06cd5);
+  color:#fff;
+  cursor:not-allowed;
+  opacity:.5;
+  transition:all .3s ease;
+  box-shadow:0 8px 24px rgba(78,205,196,.3);
+}
+.start-btn.ready{
+  cursor:pointer;
+  opacity:1;
+  box-shadow:0 12px 32px rgba(78,205,196,.6);
+  animation:pulseGlow 2.2s ease-in-out infinite;
+}
+.start-btn.ready:hover{ transform:translateY(-4px) scale(1.05); }
+.start-btn.ready:active{ transform:scale(.98); }
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 12px 32px rgba(78,205,196,.5);}
+  50%{box-shadow:0 12px 46px rgba(78,205,196,.9);}
+}
+.start-btn.locked{ animation:shake .5s; }
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-8px);}
+  40%{transform:translateX(8px);}
+  60%{transform:translateX(-5px);}
+  80%{transform:translateX(5px);}
+}
+
+/* ---------- PREGUNTA INDIVIDUAL ---------- */
+.q-header{
+  display:flex; align-items:center; justify-content:center; gap:.6rem;
+  margin-bottom:.4rem;
+}
+.q-num-badge{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:clamp(.75rem,1.6vw,.9rem);
+  padding:4px 14px; border-radius:999px;
+  background:linear-gradient(135deg,#a06cd5,#ff6b6b);
+  letter-spacing:1.2px;
+  box-shadow:0 6px 18px rgba(160,108,213,.4);
+}
+.q-text{
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(1.15rem,2.8vw,1.8rem);
+  font-weight:700;
+  margin:1rem 0 1.6rem;
+  max-width:900px;
+  line-height:1.35;
+  color:#fff;
+}
+.q-text .hl{
+  background:linear-gradient(135deg,#ffe66d,#4ecdc4);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.answers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.9rem;
+  width:100%; max-width:780px;
+}
+.answer{
+  font-family:'Nunito',sans-serif;
+  font-size:clamp(.88rem,1.9vw,1.05rem);
+  font-weight:700;
+  padding:1rem 1.1rem;
+  border-radius:16px;
+  border:2px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:#fff; cursor:pointer;
+  transition:all .25s ease;
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; gap:.7rem;
+  text-align:left;
+}
+.answer .letter{
+  flex-shrink:0;
+  width:30px; height:30px; border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:grid; place-items:center;
+  font-family:'Fredoka',sans-serif;
+  font-size:.95em;
+  transition:.25s;
+}
+.answer:hover:not(:disabled){
+  background:rgba(78,205,196,.18);
+  border-color:#4ecdc4;
+  transform:translateY(-3px);
+}
+.answer:hover:not(:disabled) .letter{ background:#4ecdc4; color:#0b0a1f; }
+.answer.selected{
+  background:linear-gradient(135deg,rgba(160,108,213,.45),rgba(78,205,196,.35));
+  border-color:#a06cd5;
+  box-shadow:0 10px 30px rgba(160,108,213,.5);
+  transform:translateY(-2px);
+}
+.answer.selected .letter{
+  background:#a06cd5; color:#fff;
+  box-shadow:0 0 14px rgba(160,108,213,.9);
+}
+.answer:disabled{ cursor:default; opacity:.85; }
+
+.answer-hint{
+  margin-top:1.4rem;
+  font-size:clamp(.78rem,1.6vw,.9rem);
+  font-weight:700;
+  color:#ffe66d;
+  min-height:1.4em;
+  transition:.25s;
+}
+.answer-hint.ready{ color:#25D366; }
+
+@media(max-width:640px){
+  .answers{grid-template-columns:1fr;}
+}
+
+.score-display{margin:.6rem 0 1rem; text-align:center;}
+.score-big{
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(3.5rem,12vw,7rem);
+  font-weight:700;
+  background:linear-gradient(135deg,#ffe66d,#ff6b6b,#a06cd5);
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 0 24px rgba(255,230,109,.4));
+  line-height:1;
+}
+.score-msg{
+  font-size:clamp(1rem,2.2vw,1.3rem);
+  margin-top:.6rem;
+  color:rgba(255,255,255,.88);
+  font-weight:700;
+}
+.wa-btn{
+  display:inline-flex;
+  align-items:center; gap:.7rem;
+  background:linear-gradient(135deg,var(--wa1),var(--wa2));
+  color:#fff;
+  font-family:'Fredoka',sans-serif;
+  font-size:clamp(1rem,2.2vw,1.3rem);
+  font-weight:700;
+  padding:1rem 2rem;
+  border-radius:999px;
+  border:none; cursor:pointer;
+  text-decoration:none;
+  transition:transform .25s, box-shadow .25s;
+  box-shadow:0 10px 30px rgba(37,211,102,.4);
+  margin-top:1.2rem;
+}
+.wa-btn:hover{
+  transform:translateY(-4px) scale(1.04);
+  box-shadow:0 14px 42px rgba(37,211,102,.65);
+}
+.wa-btn:active{transform:scale(.98);}
+.wa-btn .wa-icon{font-size:1.3em; line-height:1;}
+
+.dots{position:fixed; bottom:26px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:100;}
+.dot{
+  width:9px; height:9px; border-radius:50%;
+  background:rgba(255,255,255,.25);
+  border:none; padding:0; cursor:pointer;
+  transition:.35s cubic-bezier(.34,1.4,.64,1);
+}
+.dot:hover:not(:disabled){background:rgba(255,255,255,.55);}
+.dot.active{width:28px; border-radius:6px; background:#4ecdc4; box-shadow:0 0 14px #4ecdc4;}
+.dot:disabled{opacity:.2; cursor:not-allowed;}
+.dot.exam-dot{ background:rgba(255,230,109,.35); }
+.dot.exam-dot.active{ background:#ffe66d; box-shadow:0 0 14px #ffe66d; }
+
+.controls{position:fixed; bottom:16px; right:22px; display:flex; gap:10px; z-index:100;}
+.nav-btn{
+  width:48px; height:48px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.08);
+  color:#fff; font-size:1.1rem; cursor:pointer;
+  backdrop-filter:blur(10px); transition:.25s;
+  display:grid; place-items:center;
+}
+.nav-btn:hover:not(:disabled){background:rgba(78,205,196,.35); transform:scale(1.12); border-color:#4ecdc4;}
+.nav-btn:disabled{opacity:.25; cursor:not-allowed;}
+.nav-btn.locked{animation:shake .5s;}
+
+.confetti{
+  position:fixed; top:-24px; width:10px; height:16px;
+  z-index:999; pointer-events:none; border-radius:2px;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(108vh) rotate(760deg); opacity:.85;}
+}
+@media(max-width:640px){
+  .slide{padding:8vh 5vw 16vh;}
+  .controls{bottom:auto; top:14px; right:14px;}
+  .nav-btn{width:40px;height:40px;font-size:.95rem;}
+  .dots{bottom:22px; left:auto; right:14px; transform:none;}
+  .topbar{padding:0 14px; height:48px;}
+  .eval-title{font-size:.78rem;}
+  .counter{font-size:.68rem;}
+  .lock-badge{font-size:.6rem; padding:2px 6px;}
+  .brand{bottom:14px; left:12px; padding:4px 8px; border-radius:8px;}
+  .brand img{height:26px;}
+  .cover-title{font-size:clamp(2.4rem,13vw,4rem);}
+}
+@media(max-width:400px){
+  .brand img{height:22px;}
+  .dots{gap:6px;}
+  .dot{width:7px;height:7px;}
+  .dot.active{width:20px;}
+  .eval-title{font-size:.7rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="topbar">
+  <div class="eval-title">
+    <span class="dot-ev"></span>
+    EVALUACIÓN 1 · HTML5
+  </div>
+  <div class="counter">
+    <span><b id="curNum">01</b> / <span id="totNum">19</span></span>
+    <span class="lock-badge" id="lockBadge">🔒 en curso</span>
+  </div>
+</div>
+
+<div class="brand" id="brandLogo">
+  <img src="logo-fundabit.png" alt="Fundabit · Nueva Esparta"
+       onerror="document.getElementById('brandLogo').style.display='none'">
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0 · PORTADA + FORMULARIO OBLIGATORIO -->
+  <section class="slide">
+    <div class="anim" style="--d:.05s"><span class="badge">Fundabit Nueva Esparta</span></div>
+    <h1 class="cover-title anim" style="--d:.15s">HTML<span class="grad">5</span></h1>
+    <p class="cover-sub anim" style="--d:.28s">🚀 La historia que cambió la web</p>
+
+    <div class="form-wrap anim" style="--d:.45s">
+      <input type="text" id="studentName" class="exam-input"
+             placeholder="✍️ Nombre y apellido" autocomplete="off">
+      <input type="text" id="studentCedula" class="exam-input"
+             placeholder="🆔 Cédula de identidad (6 a 10 dígitos)" autocomplete="off" inputmode="numeric">
+      <p class="form-status" id="formStatus">⚠️ Completa tus datos para comenzar</p>
+      <button class="start-btn" id="startBtn" disabled>🚀 Comenzar presentación</button>
+    </div>
+  </section>
+
+  <!-- 1 · ¿QUÉ ES HTML? -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">🤔 ¿Qué es HTML?</h2>
+    <p class="lead anim" style="--d:.15s"><b>H</b>yper<b>T</b>ext <b>M</b>arkup <b>L</b>anguage</p>
+    <div class="cards">
+      <div class="card anim" style="--d:.30s">
+        <div class="emoji">🚫</div>
+        <h3>No es programación</h3>
+        <p>Es un lenguaje de <b>etiquetas</b>: describe qué hay en la página, no qué hacer con ella.</p>
+      </div>
+      <div class="card anim" style="--d:.45s">
+        <div class="emoji">🏠</div>
+        <h3>Como una casa</h3>
+        <p>HTML son los muros y las habitaciones. Los muebles y la pintura vienen después.</p>
+      </div>
+    </div>
+    <pre class="code anim" style="--d:.60s">&lt;h1&gt;¡Hola, mundo!&lt;/h1&gt;</pre>
+  </section>
+
+  <!-- 2 · 1991 -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">👨‍🔬 1991 · El nacimiento</h2>
+    <div class="cards">
+      <div class="card anim" style="--d:.20s">
+        <div class="emoji">🧪</div>
+        <h3>Tim Berners-Lee</h3>
+        <p>Un <b>físico</b>, no un informático, trabajando en el CERN (Suiza).</p>
+      </div>
+      <div class="card anim" style="--d:.35s">
+        <div class="emoji">💡</div>
+        <h3>Su idea</h3>
+        <p>Compartir documentos científicos entre investigadores de todo el mundo.</p>
+      </div>
+      <div class="card anim" style="--d:.50s">
+        <div class="emoji">🧰</div>
+        <h3>Inventó TODO</h3>
+        <p>HTML + HTTP + URL + el primer navegador. Cuatro piezas, una revolución.</p>
+      </div>
+    </div>
+    <p class="fact anim" style="--d:.65s">🎉 La primera página web <b>sigue online</b>: <b>info.cern.ch</b></p>
+  </section>
+
+  <!-- 3 · GUERRA -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">⚔️ Los 90 · La Guerra de los Navegadores</h2>
+    <div class="vs">
+      <div class="fighter anim" style="--d:.20s">
+        <div class="emoji big">🟢</div>
+        <h3>Netscape</h3>
+      </div>
+      <div class="vs-badge anim" style="--d:.35s">VS</div>
+      <div class="fighter anim" style="--d:.20s">
+        <div class="emoji big">🔵</div>
+        <h3>Internet Explorer</h3>
+      </div>
+    </div>
+    <p class="lead anim" style="--d:.50s; margin-top:1.2rem">Cada uno inventaba etiquetas que el otro no entendía…</p>
+    <div class="tags anim" style="--d:.65s">
+      <span class="tag">&lt;blink&gt;</span>
+      <span class="tag">&lt;marquee&gt;</span>
+      <span class="tag">&lt;font&gt;</span>
+      <span class="tag">&lt;center&gt;</span>
+    </div>
+    <p class="fact anim" style="--d:.80s">😵 Resultado: la misma web se veía distinta en cada navegador</p>
+  </section>
+
+  <!-- 4 · DOCTYPE -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">📜 El Doctype más largo del mundo</h2>
+    <p class="lead anim" style="--d:.15s">Antes había que escribir esto <b>en cada página</b>:</p>
+    <pre class="code code-bad anim" style="--d:.30s">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd"&gt;</pre>
+    <p class="lead anim" style="--d:.45s">En HTML5 basta con <b>una línea</b>:</p>
+    <pre class="code code-good anim" style="--d:.60s">&lt;!DOCTYPE html&gt;</pre>
+    <p class="fact anim" style="--d:.75s">✨ Simplificar = menos errores y más compatibilidad</p>
+  </section>
+
+  <!-- 5 · WHATWG -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">🔥 2004 · La rebelión del WHATWG</h2>
+    <p class="lead anim" style="--d:.15s">Apple, Mozilla y Opera se cansaron y crearon su propio grupo de trabajo</p>
+    <div class="timeline">
+      <div class="tl-item anim" style="--d:.30s">
+        <span class="tl-dot"></span><b>2004</b> — Nace el <b>WHATWG</b> (Web Hypertext Application Technology Working Group).
+      </div>
+      <div class="tl-item anim" style="--d:.45s">
+        <span class="tl-dot"></span><b>2008</b> — Se publica el <b>primer borrador</b> de HTML5.
+      </div>
+      <div class="tl-item anim" style="--d:.60s">
+        <span class="tl-dot"></span><b>2014</b> — El W3C lo convierte en <b>recomendación oficial</b>. 🎊
+      </div>
+    </div>
+    <p class="fact anim" style="--d:.75s">🧠 Filosofía HTML5: sé tolerante con los errores y prioriza la compatibilidad</p>
+  </section>
+
+  <!-- 6 · 2014 -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">🎊 Octubre de 2014 · ¡Por fin oficial!</h2>
+    <div class="big-year anim" style="--d:.20s">2014</div>
+    <p class="lead anim" style="--d:.35s">El <b>W3C</b> publica HTML5 como recomendación oficial</p>
+    <div class="cards">
+      <div class="card anim" style="--d:.50s">
+        <div class="emoji">⏳</div>
+        <h3>Más de una década</h3>
+        <p>Del primer borrador (2008) a la versión oficial pasaron <b>6 años</b> de revisiones.</p>
+      </div>
+      <div class="card anim" style="--d:.65s">
+        <div class="emoji">🌍</div>
+        <h3>Ya se usaba antes</h3>
+        <p>Muchísimos sitios usaban HTML5 <b>años antes</b> de que fuera "oficial".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · 3 PILARES -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">🧩 HTML5 no es solo HTML</h2>
+    <p class="lead anim" style="--d:.15s">Es una <b>familia</b> de tres tecnologías que trabajan juntas</p>
+    <div class="cards">
+      <div class="card anim" style="--d:.30s">
+        <div class="emoji">🦴</div>
+        <h3>HTML</h3>
+        <p><b>Estructura</b><br>El esqueleto: qué hay en la página.</p>
+      </div>
+      <div class="card anim" style="--d:.45s">
+        <div class="emoji">👕</div>
+        <h3>CSS3</h3>
+        <p><b>Presentación</b><br>La ropa: cómo se ve.</p>
+      </div>
+      <div class="card anim" style="--d:.60s">
+        <div class="emoji">🧠</div>
+        <h3>JavaScript</h3>
+        <p><b>Comportamiento</b><br>Los músculos: qué hace.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · SEMÁNTICA -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">📰 Adiós a los &lt;div&gt; por todas partes</h2>
+    <p class="lead anim" style="--d:.15s">HTML5 trajo etiquetas con <b>significado</b>, como las secciones de un periódico</p>
+    <div class="tags anim" style="--d:.30s">
+      <span class="tag">&lt;header&gt;</span>
+      <span class="tag">&lt;nav&gt;</span>
+      <span class="tag">&lt;main&gt;</span>
+      <span class="tag">&lt;section&gt;</span>
+      <span class="tag">&lt;article&gt;</span>
+      <span class="tag">&lt;aside&gt;</span>
+      <span class="tag">&lt;footer&gt;</span>
+    </div>
+    <p class="fact anim" style="--d:.50s">🤖 Bonus: los buscadores y los lectores de pantalla ahora <b>entienden</b> mejor tu página.</p>
+  </section>
+
+  <!-- 9 · APIs -->
+  <section class="slide">
+    <h2 class="anim" style="--d:.05s">🪄 Las APIs: la magia de HTML5</h2>
+    <div class="grid-apis">
+      <div class="api anim" style="--d:.18s">🎨<b>Canvas</b><span>Dibujar y animar con código</span></div>
+      <div class="api anim" style="--d:.28s">📍<b>Geolocalización</b><span>Saber dónde estás</span></div>
+      <div class="api anim" style="--d:.38s">🎬<b>Video y Audio</b><span>Sin plugins externos</span></div>
+      <div class="api anim" style="--d:.48s">💾<b>Web Storage</b><span>Guardar datos en el navegador</span></div>
+      <div class="api anim" style="--d:.58s">🖱️<b>Drag &amp; Drop</b><span>Arrastrar elementos</span></div>
+      <div class="api anim" style="--d:.68s">📡<b>WebSockets</b><span>Tiempo real</span></div>
+    </div>
+    <p class="fact anim" style="--d:.85s">👋 Con todo esto, <b>Flash</b> dejó de ser necesario</p>
+  </section>
+
+  <!-- 10 · PREGUNTA 1 -->
+  <section class="slide question-slide" data-qindex="0">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 1 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿Quién inventó <span class="hl">HTML</span> y en qué año lo hizo?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> Bill Gates, 1985</button>
+      <button class="answer anim" style="--d:.38s" data-correct="1"><span class="letter">B</span> Tim Berners-Lee, 1991</button>
+      <button class="answer anim" style="--d:.46s" data-correct="0"><span class="letter">C</span> Steve Jobs, 1995</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Mark Zuckerberg, 2000</button>
+    </div>
+    <p class="answer-hint" id="hint0">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 11 · PREGUNTA 2 -->
+  <section class="slide question-slide" data-qindex="1">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 2 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿En qué institución trabajaba <span class="hl">Tim Berners-Lee</span> cuando creó la web?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> NASA (Estados Unidos)</button>
+      <button class="answer anim" style="--d:.38s" data-correct="0"><span class="letter">B</span> Microsoft (Estados Unidos)</button>
+      <button class="answer anim" style="--d:.46s" data-correct="1"><span class="letter">C</span> CERN (Suiza)</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Apple (Estados Unidos)</button>
+    </div>
+    <p class="answer-hint" id="hint1">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 12 · PREGUNTA 3 -->
+  <section class="slide question-slide" data-qindex="2">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 3 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿Qué <span class="hl">empresas</span> formaron el WHATWG en 2004?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> Google, Facebook y Amazon</button>
+      <button class="answer anim" style="--d:.38s" data-correct="1"><span class="letter">B</span> Apple, Mozilla y Opera</button>
+      <button class="answer anim" style="--d:.46s" data-correct="0"><span class="letter">C</span> Microsoft, IBM y Oracle</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Netflix, Twitter y YouTube</button>
+    </div>
+    <p class="answer-hint" id="hint2">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 13 · PREGUNTA 4 -->
+  <section class="slide question-slide" data-qindex="3">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 4 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿En qué año <span class="hl">HTML5</span> fue reconocido como estándar oficial por el W3C?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> 2004</button>
+      <button class="answer anim" style="--d:.38s" data-correct="0"><span class="letter">B</span> 2008</button>
+      <button class="answer anim" style="--d:.46s" data-correct="1"><span class="letter">C</span> 2014</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> 2020</button>
+    </div>
+    <p class="answer-hint" id="hint3">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 14 · PREGUNTA 5 -->
+  <section class="slide question-slide" data-qindex="4">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 5 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿Qué tecnología quedó <span class="hl">obsoleta</span> gracias a las APIs de HTML5?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> Java</button>
+      <button class="answer anim" style="--d:.38s" data-correct="0"><span class="letter">B</span> PHP</button>
+      <button class="answer anim" style="--d:.46s" data-correct="1"><span class="letter">C</span> Adobe Flash</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Python</button>
+    </div>
+    <p class="answer-hint" id="hint4">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 15 · PREGUNTA 6 -->
+  <section class="slide question-slide" data-qindex="5">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 6 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿Cuáles son los <span class="hl">3 pilares</span> de la web moderna?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> Word, Excel y PowerPoint</button>
+      <button class="answer anim" style="--d:.38s" data-correct="1"><span class="letter">B</span> HTML, CSS y JavaScript</button>
+      <button class="answer anim" style="--d:.46s" data-correct="0"><span class="letter">C</span> Windows, Mac y Linux</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Google, Bing y Yahoo</button>
+    </div>
+    <p class="answer-hint" id="hint5">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 16 · PREGUNTA 7 -->
+  <section class="slide question-slide" data-qindex="6">
+    <div class="q-header anim" style="--d:.05s">
+      <span class="q-num-badge">PREGUNTA 7 / 7</span>
+    </div>
+    <p class="q-text anim" style="--d:.15s">
+      ¿Qué <span class="hl">tipo de lenguaje</span> es HTML?
+    </p>
+    <div class="answers">
+      <button class="answer anim" style="--d:.30s" data-correct="0"><span class="letter">A</span> Lenguaje de programación</button>
+      <button class="answer anim" style="--d:.38s" data-correct="1"><span class="letter">B</span> Lenguaje de marcado (etiquetas)</button>
+      <button class="answer anim" style="--d:.46s" data-correct="0"><span class="letter">C</span> Lenguaje de bases de datos</button>
+      <button class="answer anim" style="--d:.54s" data-correct="0"><span class="letter">D</span> Lenguaje de diseño gráfico</button>
+    </div>
+    <p class="answer-hint" id="hint6">Selecciona una respuesta para continuar</p>
+  </section>
+
+  <!-- 17 · RESULTADOS -->
+  <section class="slide">
+    <div class="emoji big anim" style="--d:.05s">🏆</div>
+    <h2 class="anim" style="--d:.15s">Tus resultados</h2>
+    <div class="score-display anim" style="--d:.30s">
+      <div class="score-big" id="scoreBig">0/7</div>
+      <div class="score-msg" id="scoreMsg">—</div>
+    </div>
+    <button class="wa-btn anim" id="waBtn" style="--d:.45s">
+      <span class="wa-icon">📱</span> Enviar resultados por WhatsApp
+    </button>
+    <p class="fact anim" style="--d:.60s">
+      🧑‍🏫 Tus resultados se enviarán directamente al profesor (0412-3583262)
+    </p>
+  </section>
+
+  <!-- 18 · CIERRE -->
+  <section class="slide">
+    <div class="emoji big anim" style="--d:.05s">🚀</div>
+    <h2 class="anim" style="--d:.15s">El futuro de la web lo escribes tú</h2>
+    <p class="lead anim" style="--d:.30s">HTML5 tardó más de una década en llegar…<br>y hoy es la base de <b>casi todo</b> lo que ves en internet.</p>
+    <div class="tags anim" style="--d:.45s">
+      <span class="tag">Aprende HTML</span>
+      <span class="tag">Aprende CSS</span>
+      <span class="tag">Aprende JavaScript</span>
+    </div>
+    <p class="fact anim" style="--d:.60s">🎓 ¡Gracias! Ahora… ¿te atreves a crear tu primera página?</p>
+  </section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+
+<div class="controls">
+  <button class="nav-btn" id="prevBtn" aria-label="Anterior">◀</button>
+  <button class="nav-btn" id="nextBtn" aria-label="Siguiente">▶</button>
+</div>
+
+<script>
+(function(){
+  /* ============================================================
+     CONFIGURACIÓN
+     ============================================================ */
+  const WHATSAPP_NUMBER = '584123583262';
+  const TOTAL_QUESTIONS = 7;
+  const FORM_INDEX      = 0;
+  const EXAM_START      = 10;   // primera pregunta
+  const EXAM_END        = 16;   // última pregunta
+  const RESULTS_INDEX   = 17;
+  const LAST_INDEX_CIERRE = 18;
+
+  const STORAGE_PROGRESS = 'html5_fundabit_progress_v2';
+  const STORAGE_STARTED  = 'html5_fundabit_started_v2';
+  const STORAGE_NAME     = 'html5_fundabit_name_v2';
+  const STORAGE_CEDULA   = 'html5_fundabit_cedula_v2';
+  const STORAGE_EXAM_ANSWERS = 'html5_fundabit_answers_v2';
+
+  /* ============================================================
+     ELEMENTOS
+     ============================================================ */
+  const slides    = Array.from(document.querySelectorAll('.slide'));
+  const deck      = document.getElementById('deck');
+  const prevBtn   = document.getElementById('prevBtn');
+  const nextBtn   = document.getElementById('nextBtn');
+  const dotsWrap  = document.getElementById('dots');
+  const bar       = document.getElementById('progressBar');
+  const curNum    = document.getElementById('curNum');
+  const totNum    = document.getElementById('totNum');
+  const lockBadge = document.getElementById('lockBadge');
+  const nameInput = document.getElementById('studentName');
+  const cedInput  = document.getElementById('studentCedula');
+  const formStatus= document.getElementById('formStatus');
+  const startBtn  = document.getElementById('startBtn');
+
+  let current = 0;
+  const LAST_INDEX = slides.length - 1;
+  totNum.textContent = String(slides.length).padStart(2,'0');
+
+  /* ============================================================
+     ESTADO DEL EXAMEN
+     ============================================================ */
+  // examAnswers[i] = { correct: 0|1, selectedIdx: number } | null
+  let examAnswers = new Array(TOTAL_QUESTIONS).fill(null);
+
+  // Restaurar respuestas guardadas
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_EXAM_ANSWERS) || 'null');
+    if (Array.isArray(saved) && saved.length === TOTAL_QUESTIONS) {
+      examAnswers = saved;
+    }
+  } catch(e){}
+
+  function saveAnswers(){
+    try { localStorage.setItem(STORAGE_EXAM_ANSWERS, JSON.stringify(examAnswers)); } catch(e){}
+  }
+
+  /* ============================================================
+     PERSISTENCIA
+     ============================================================ */
+  const safeGet = (k) => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+  const safeSet = (k,v) => { try { localStorage.setItem(k,v); } catch(e){} };
+
+  let hasStarted = safeGet(STORAGE_STARTED) === '1';
+  let savedIndex = parseInt(safeGet(STORAGE_PROGRESS) || '0', 10) || 0;
+  if (savedIndex < 0 || savedIndex > LAST_INDEX) savedIndex = 0;
+
+  // Datos del alumno
+  const savedName   = safeGet(STORAGE_NAME);
+  const savedCedula = safeGet(STORAGE_CEDULA);
+  if (savedName)   nameInput.value = savedName;
+  if (savedCedula) cedInput.value  = savedCedula;
+
+  nameInput.addEventListener('input', () => {
+    safeSet(STORAGE_NAME, nameInput.value);
+    checkForm();
+  });
+  cedInput.addEventListener('input', () => {
+    cedInput.value = cedInput.value.replace(/\D/g, '').slice(0, 10);
+    safeSet(STORAGE_CEDULA, cedInput.value);
+    checkForm();
+  });
+
+  /* ============================================================
+     VALIDACIÓN DEL FORMULARIO
+     ============================================================ */
+  function isFormComplete(){
+    const nombre = nameInput.value.trim();
+    const cedula = cedInput.value.trim();
+    const nombreOk = nombre.length >= 5 && nombre.split(/\s+/).length >= 2;
+    const cedulaOk = /^\d{6,10}$/.test(cedula);
+    return { ok: nombreOk && cedulaOk, nombreOk, cedulaOk };
+  }
+
+  function checkForm(){
+    const { ok, nombreOk, cedulaOk } = isFormComplete();
+
+    nameInput.classList.toggle('filled', nombreOk);
+    cedInput.classList.toggle('filled', cedulaOk);
+
+    if (ok) {
+      formStatus.textContent = '✅ ¡Listo! Pulsa "Comenzar presentación"';
+      formStatus.className = 'form-status ok';
+    } else if (!nombreOk && !cedulaOk) {
+      formStatus.textContent = '⚠️ Escribe tu nombre completo y cédula';
+      formStatus.className = 'form-status warn';
+    } else if (!nombreOk) {
+      formStatus.textContent = '⚠️ Falta nombre y apellido';
+      formStatus.className = 'form-status warn';
+    } else {
+      formStatus.textContent = '⚠️ Falta la cédula (6 a 10 dígitos)';
+      formStatus.className = 'form-status warn';
+    }
+
+    if (current === FORM_INDEX) {
+      startBtn.classList.toggle('ready', ok);
+      startBtn.disabled = !ok;
+      nextBtn.disabled = !ok;
+    }
+  }
+
+  /* ============================================================
+     PUNTOS DE NAVEGACIÓN
+     ============================================================ */
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot';
+    if (i >= EXAM_START && i <= EXAM_END) d.classList.add('exam-dot');
+    d.setAttribute('aria-label', 'Ir a la diapositiva ' + (i+1));
+    d.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(document.querySelectorAll('.dot'));
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  let toastEl = null;
+  function showToast(msg){
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 2600);
+  }
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+  function isExamSlide(idx){ return idx >= EXAM_START && idx <= EXAM_END; }
+  function isAnswerSelected(qi){ return examAnswers[qi] && typeof examAnswers[qi].selectedIdx === 'number'; }
+
+  /* ============================================================
+     NAVEGACIÓN
+     ============================================================ */
+  function goTo(i){
+    const targetIndex = Math.max(0, Math.min(LAST_INDEX, i));
+
+    // 🔒 Volver a la portada una vez empezado
+    if (hasStarted && targetIndex === FORM_INDEX) {
+      showToast('🔒 Ya comenzaste la presentación.\nContinúa donde la dejaste.');
+      return;
+    }
+
+    // 🔒 No avanzar de la portada sin datos completos
+    if (current === FORM_INDEX && targetIndex > FORM_INDEX) {
+      const { ok } = isFormComplete();
+      if (!ok) {
+        startBtn.classList.add('locked');
+        setTimeout(() => startBtn.classList.remove('locked'), 500);
+        showToast('⚠️ Debes completar nombre y cédula\npara comenzar.');
+        return;
+      }
+      hasStarted = true;
+      safeSet(STORAGE_STARTED, '1');
+    }
+
+    // 🔒 NO RETROCEDER una vez dentro del examen
+    if (isExamSlide(current) && targetIndex < current) {
+      prevBtn.classList.add('locked');
+      setTimeout(() => prevBtn.classList.remove('locked'), 500);
+      showToast('🔒 No puedes retroceder durante el examen.');
+      return;
+    }
+
+    // 🔒 NO AVANZAR sin responder la pregunta actual
+    if (isExamSlide(current) && targetIndex > current) {
+      const qi = current - EXAM_START;
+      if (!isAnswerSelected(qi)) {
+        nextBtn.classList.add('locked');
+        setTimeout(() => nextBtn.classList.remove('locked'), 500);
+        showToast('⚠️ Debes responder la pregunta\nantes de continuar.');
+        return;
+      }
+    }
+
+    // 🔒 Si estás en la última pregunta y quieres pasar a resultados, verifica todo
+    if (current === EXAM_END && targetIndex > EXAM_END) {
+      const faltan = examAnswers.filter(a => !a || typeof a.selectedIdx !== 'number').length;
+      if (faltan > 0) {
+        showToast('⚠️ Aún tienes ' + faltan + ' pregunta' + (faltan>1?'s':'') + ' sin responder.');
+        return;
+      }
+    }
+
+    current = targetIndex;
+    safeSet(STORAGE_PROGRESS, String(current));
+
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === current));
+    dots.forEach((d, idx) => {
+      d.classList.toggle('active', idx === current);
+      // Puntos de examen: no se pueden clicar salvo el actual
+      if (isExamSlide(idx)) {
+        d.disabled = (idx !== current);
+      } else {
+        d.disabled = hasStarted && idx === FORM_INDEX;
+      }
+      d.title = d.disabled ? '🔒 Bloqueado' : ('Ir a la diapositiva ' + (idx+1));
+    });
+
+    bar.style.width = ((current + 1) / slides.length * 100) + '%';
+    curNum.textContent = String(current + 1).padStart(2,'0');
+
+    // Estado del botón anterior
+    const minAllowed = hasStarted ? 1 : 0;
+    prevBtn.disabled =
+      (current <= minAllowed) ||
+      isExamSlide(current);    // 🔒 bloqueo de retroceso en el examen
+
+    // Estado del botón siguiente
+    if (current === FORM_INDEX) {
+      const { ok } = isFormComplete();
+      nextBtn.disabled = !ok;
+      startBtn.disabled = !ok;
+      startBtn.classList.toggle('ready', ok);
+      checkForm();
+    } else if (isExamSlide(current)) {
+      const qi = current - EXAM_START;
+      nextBtn.disabled = !isAnswerSelected(qi);
+    } else {
+      nextBtn.disabled = current === LAST_INDEX;
+    }
+
+    if (hasStarted) lockBadge.classList.add('show');
+    else lockBadge.classList.remove('show');
+
+    // Efectos
+    if (current === RESULTS_INDEX) {
+      updateResults();
+      if (calculateScore() >= 5) confetti();
+    }
+    if (current === LAST_INDEX_CIERRE) confetti();
+  }
+
+  const next = () => goTo(current + 1);
+  const prev = () => goTo(current - 1);
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  startBtn.addEventListener('click', () => {
+    const { ok } = isFormComplete();
+    if (!ok) {
+      startBtn.classList.add('locked');
+      setTimeout(() => startBtn.classList.remove('locked'), 500);
+      showToast('⚠️ Completa nombre y cédula\npara comenzar.');
+      return;
+    }
+    goTo(1);
+  });
+
+  /* ============================================================
+     TECLADO
+     ============================================================ */
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key))          { e.preventDefault(); prev(); }
+    if (e.key === 'Home') goTo(hasStarted ? 1 : 0);
+    if (e.key === 'End')  goTo(LAST_INDEX);
+  });
+
+  /* ============================================================
+     CLIC SOBRE DIAPOSITIVA
+     ============================================================ */
+  deck.addEventListener('click', e => {
+    if (e.target.closest('button, input, a, .answer')) return;
+    if (e.clientX < window.innerWidth * 0.28) prev();
+    else next();
+  });
+
+  /* ============================================================
+     SWIPE
+     ============================================================ */
+  let touchX = 0, touchY = 0;
+  document.addEventListener('touchstart', e => {
+    touchX = e.changedTouches[0].clientX;
+    touchY = e.changedTouches[0].clientY;
+  }, {passive:true});
+
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    const dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+      dx < 0 ? next() : prev();
+    }
+  }, {passive:true});
+
+  /* ============================================================
+     RESPUESTAS DE LAS PREGUNTAS
+     ============================================================ */
+  document.querySelectorAll('.question-slide').forEach(slide => {
+    const qi = parseInt(slide.dataset.qindex, 10);
+    const answers = slide.querySelectorAll('.answer');
+    const hint = slide.querySelector('.answer-hint');
+
+    // Si ya había una respuesta guardada, marcarla
+    if (examAnswers[qi] && typeof examAnswers[qi].selectedIdx === 'number') {
+      const sel = examAnswers[qi].selectedIdx;
+      answers.forEach((b, idx) => {
+        if (idx === sel) b.classList.add('selected');
+      });
+      hint.textContent = '✅ Respuesta guardada';
+      hint.classList.add('ready');
+    }
+
+    answers.forEach((btn, idx) => {
+      btn.addEventListener('click', () => {
+        // Bloquea cambios si ya respondió (opcional: comenta para permitir cambiar)
+        if (examAnswers[qi] && typeof examAnswers[qi].selectedIdx === 'number') {
+          showToast('🔒 Ya respondiste esta pregunta.');
+          return;
+        }
+
+        // Marcar visualmente
+        answers.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Guardar
+        examAnswers[qi] = {
+          selectedIdx: idx,
+          correct: btn.dataset.correct === '1' ? 1 : 0
+        };
+        saveAnswers();
+
+        // Hint
+        hint.textContent = '✅ Respuesta guardada · Pulsa ▶ para continuar';
+        hint.classList.add('ready');
+
+        // Habilitar next
+        nextBtn.disabled = false;
+      });
+    });
+  });
+
+  /* ============================================================
+     CÁLCULO
+     ============================================================ */
+  function calculateScore(){
+    return examAnswers.reduce((s, a) => s + ((a && a.correct) ? 1 : 0), 0);
+  }
+  function countAnswered(){
+    return examAnswers.filter(a => a && typeof a.selectedIdx === 'number').length;
+  }
+
+  function updateResults(){
+    const score = calculateScore();
+    const pct = Math.round(score / TOTAL_QUESTIONS * 100);
+    document.getElementById('scoreBig').textContent = score + '/' + TOTAL_QUESTIONS;
+    let msg = '';
+    if (pct === 100)    msg = '🌟 ¡PERFECTO! Eres un crack de HTML5';
+    else if (pct >= 80) msg = '👏 ¡Excelente! Dominas la historia de HTML5';
+    else if (pct >= 60) msg = '💪 ¡Bien! Vas por buen camino';
+    else if (pct >= 40) msg = '📖 Repasa un poco más la presentación';
+    else                msg = '🔁 Vuelve a ver la presentación y reinténtalo';
+    document.getElementById('scoreMsg').textContent = msg + '  ·  ' + pct + '%';
+  }
+
+  /* ============================================================
+     ENVIAR POR WHATSAPP
+     ============================================================ */
+  document.getElementById('waBtn').addEventListener('click', () => {
+    const nombre = (nameInput.value || '').trim() || 'Estudiante';
+    const cedula = (cedInput.value  || '').trim() || 'sin cédula';
+
+    const score = calculateScore();
+    const pct = Math.round(score / TOTAL_QUESTIONS * 100);
+    let emoji, estado;
+    if (pct === 100)    { emoji='🌟'; estado='¡PERFECTO!'; }
+    else if (pct >= 80) { emoji='👏'; estado='¡Excelente!'; }
+    else if (pct >= 60) { emoji='💪'; estado='Aprobado'; }
+    else if (pct >= 40) { emoji='📖'; estado='Necesito repasar'; }
+    else                { emoji='🔁'; estado='Debo repasar más'; }
+
+    const fecha = new Date().toLocaleString('es-VE', {
+      day:'2-digit', month:'2-digit', year:'numeric',
+      hour:'2-digit', minute:'2-digit'
+    });
+
+    // Detalle pregunta por pregunta
+    let detalle = '';
+    examAnswers.forEach((a, i) => {
+      const ok = a && a.correct ? '✅' : '❌';
+      detalle += `${ok} P${i+1}\n`;
+    });
+
+    const texto =
+`¡Hola! 🎓
+
+📝 *EVALUACIÓN 1 · HTML5*
+🏫 Fundabit Nueva Esparta
+
+━━━━━━━━━━━━━━━
+👤 *DATOS DEL ESTUDIANTE*
+━━━━━━━━━━━━━━━
+🧑 Nombre: *${nombre}*
+🆔 Cédula: *${cedula}*
+
+━━━━━━━━━━━━━━━
+📊 *RESULTADOS*
+━━━━━━━━━━━━━━━
+✅ Correctas: *${score} de ${TOTAL_QUESTIONS}*
+📈 Porcentaje: *${pct}%*
+${emoji} Estado: ${estado}
+
+📋 *Detalle:*
+${detalle}
+🕒 Fecha: ${fecha}
+━━━━━━━━━━━━━━━
+
+Enviado desde la presentación interactiva ✨`;
+
+    const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
+    window.open(url, '_blank');
+  });
+
+  /* ============================================================
+     CONFETI
+     ============================================================ */
+  function confetti(){
+    const colors = ['#ff6b6b','#4ecdc4','#ffe66d','#a06cd5','#5ee7df','#ffffff'];
+    for (let i = 0; i < 60; i++){
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.width  = (6 + Math.random() * 8) + 'px';
+      p.style.height = (10 + Math.random() * 12) + 'px';
+      p.style.animationDelay    = (Math.random() * 0.7) + 's';
+      p.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 3600);
+    }
+  }
+
+  /* ============================================================
+     ARRANQUE
+     ============================================================ */
+  if (hasStarted && savedIndex > 0) {
+    goTo(savedIndex);
+    setTimeout(() => {
+      showToast('👋 ¡Bienvenido de nuevo!\nContinuando en la diapositiva ' + (savedIndex + 1));
+    }, 400);
+  } else {
+    goTo(0);
+    checkForm();
+  }
+
+})();
+</script>
+</body>
+</html>
